@@ -1,0 +1,324 @@
+{% load static %}
+{% load leaflet_tags %}
+{% load geojson_tags %}
+
+
+<!DOCTYPE html>
+<html>
+<head>
+
+    {% leaflet_js %}
+    {% leaflet_css %}
+        <style type='text/css'>
+            #map  { width: 50%;  height:50%;}
+        </style>
+  
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>national statistics</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    
+            <!-- UIkit CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.19.2/dist/css/uikit.min.css" />
+
+<!-- UIkit JS -->
+<script src="https://cdn.jsdelivr.net/npm/uikit@3.19.2/dist/js/uikit.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/uikit@3.19.2/dist/js/uikit-icons.min.js"></script>
+<link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Arimo' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Hind:300' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300' rel='stylesheet' type='text/css'>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    {% include "vet_navbar.html" %}
+
+
+    <div class="container overflow-hidden text-center">
+        <div class="row gy-5">
+            <div class="col-6">
+                <div class="p-3">
+                    Daily count
+                    <hr class="uk-divider-icon">
+    
+                    <div>
+                        <canvas id="dayChart"></canvas>
+                    </div>
+                    
+                </div>
+              </div>
+          <div class="col-6">
+            <div class="p-3">
+                Total reported cases in the last 12 months
+                <hr class="uk-divider-icon">
+                <canvas id="myChart"></canvas>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="p-3">
+                Total cases per distict in the last 12 moths
+                <hr class="uk-divider-icon">
+                <div>
+                    <canvas id="myDistricts"></canvas>
+                </div>
+                
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="p-3">
+                Total number of farmers registered on the system per district
+                <hr class="uk-divider-icon">
+                <div>
+                    <canvas id="districtsChart"></canvas>
+                </div>
+                
+                
+
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="p-3">
+                Reported symptoms count
+                <hr class="uk-divider-icon">
+
+                <div>
+                    <canvas id="symptomsChart"></canvas>
+                </div>
+                
+            </div>
+          </div>
+          
+        </div>
+      </div>
+
+    
+    
+
+    
+
+    <div>
+      <canvas id="districtsChart"></canvas>
+  </div>
+  <div id="maps"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.js"></script>
+  <script>
+      var districts = {{ serialized_districts_all|safe }};
+
+      // Create the map
+      var map = L.map('map').setView([-17, 30.8], 13);
+
+      // Add the tile layer
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(map);
+
+      // Render the district layer
+      L.geoJSON(districts, {
+          style: {
+              fillColor: 'blue',
+              color: 'blue',
+              fillOpacity: 0.01,
+              weight: 2
+          }
+      }).addTo(map);
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script>
+        var months = [
+            {% for month in months %}
+            ['{{ month }}'],
+            {% endfor %}
+        ];
+
+        var counts = [
+            {% for count in case_counts %}
+            [{{ count }}],
+            {% endfor %}
+        ];
+
+        const ctx = document.getElementById('myChart');
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: months,
+                datasets: [{
+                    label: 'cases',
+                    data: counts,
+                    borderWidth: 1
+                }, {
+                    label: 'diseases',
+                    data: counts,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        var districts = [
+            {% for district in districts %}
+            ['{{ district }}'],
+            {% endfor %}
+        ];
+
+        var districtCounts = [
+            {% for count in district_case_counts %}
+            [{{ count }}],
+            {% endfor %}
+        ];
+
+        const ctz = document.getElementById('myDistricts');
+
+        new Chart(ctz, {
+            type: 'pie',
+            data: {
+                labels: districts,
+                datasets: [{
+                    data: districtCounts,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.6)',
+                        'rgba(54, 162, 235, 0.6)',
+                        'rgba(255, 206, 86, 0.6)',
+                        'rgba(75, 192, 192, 0.6)',
+                        'rgba(153, 102, 255, 0.6)',
+                        'rgba(255, 159, 64, 0.6)',
+                        'rgba(255, 10, 64, 0.6)',
+                        'rgba(255, 159, 164, 0.6)',
+                        'rgba(55, 99, 132, 0.6)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+
+
+        var farmer_districts = [
+        {% for district in farmer_districts %}
+        '{{ district }}',
+        {% endfor %}
+    ];
+
+    var farmer_count = [
+        {% for count in farmer_count %}
+        {{ count }},
+        {% endfor %}
+    ];
+
+    const districtsChart = document.getElementById('districtsChart');
+
+    new Chart(districtsChart, {
+      type: 'pie',
+      data: {
+          labels: farmer_districts,
+          datasets: [{
+              data: farmer_count,
+              backgroundColor: [
+                  'rgba(255, 99, 132, 0.6)',
+                  'rgba(54, 162, 235, 100.6)',
+                  'rgba(255, 206, 86, 0.6)',
+                  'rgba(75, 192, 192, 0.6)',
+                  'rgba(153, 102, 255, 0.6)',
+                  'rgba(255, 159, 64, 0.6)',
+                  'rgba(255, 10, 64, 0.6)',
+                  'rgba(255, 159, 164, 0.6)',
+                  'rgba(55, 99, 132, 0.6)'
+              ],
+              borderWidth: 1
+          }]
+      },
+      options: {
+          responsive: true,
+          maintainAspectRatio: false
+      }
+  });
+
+  var symptom_name = [
+  {% for name in symptoms_name %}
+  '{{ name }}',
+  {% endfor %}
+];
+
+
+var symptom_count = [
+  {% for count in symptoms_counts %}
+  {{ count }},
+  {% endfor %}
+];
+console.log(symptom_count);
+
+const symptomsChart = document.getElementById('symptomsChart');
+
+// Generate random colors
+var randomColors = [];
+for (var i = 0; i < symptom_name.length; i++) {
+  var randomColor = 'rgba(' + Math.floor(Math.random() * 256) + ', ' + Math.floor(Math.random() * 256) + ', ' + Math.floor(Math.random() * 256) + ', 0.6)';
+  randomColors.push(randomColor);
+}
+
+new Chart(symptomsChart, {
+  type: 'pie',
+  data: {
+    labels: symptom_name,
+    datasets: [{
+      data: symptom_count,
+      backgroundColor: randomColors,
+      borderWidth: 1
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false
+  }
+});
+
+var days = [
+    {% for day in last_5_days %}
+    "{{ day }}",
+    {% endfor %}
+];
+
+var day_count = [
+    {% for count in count_per_day %}
+    {{ count }},
+    {% endfor %}
+];
+console.log(day_count);
+
+const dayChart = document.getElementById('dayChart');
+
+new Chart(dayChart, {
+    type: 'line',
+    data: {
+        labels: days,
+        datasets: [{
+            label: 'day_count',
+            data: day_count,  // Use day_count instead of counts
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+
+
+    </script>
+</body>
+</html>
