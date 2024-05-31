@@ -1,0 +1,43 @@
+body {
+    background-color: rgb(254, 254, 255);
+}
+
+.district-map {
+    width: 680px;
+    height: 500px;
+    background-color: aqua;
+    border-radius: 8px;
+    margin-left: 50%;
+    top: 20%;
+}
+
+.district-list {
+    width: 180px;
+    height: 600px;
+    overflow:hidden;
+    overflow-y: scroll;
+    margin-top: 5px;
+}
+
+
+
+.all-districts {
+    width: 680px;
+    height: 500px;
+    background-color: rgb(41, 32, 73);
+    border-radius: 8px;
+    margin-left: 40%; 
+    margin-top: 10px;
+
+}
+
+.main-image {
+    
+    width: 400px; 
+    height: auto; 
+    object-fit: cover; 
+    
+}
+
+
+
