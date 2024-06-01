@@ -1,0 +1,46 @@
+{% extends "base2.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+login page
+{% endblock %}
+
+{% include "vet_navbar.html" %}
+
+
+
+    {% block content %}
+    <br><br>
+      <center>
+        <div class="my-form">
+        <div class="card-body">
+
+        
+  <div class="container-fluid">
+      
+    <h5 class="card-title">Sign in</h5>
+          <br><hr><br>
+          {% if submitted %}
+          <p>Successfully created an account!!</p>
+      {% else %}
+      <form method="post">
+          {% csrf_token %}
+          {{ form|crispy}}
+          <br><br>
+          <button class="btn btn-primary" type="submit">Login</button>
+      </form>
+      {% endif %}
+      <hr>
+      <a>Forgot password</a>
+      <hr>
+      <h5 class="card-title">Don't have an account?</h5>
+      <br><br>
+      <a href="{% url 'register' %}" class="btn btn-primary">Register</a>
+
+
+    </div>
+  </div>
+</div>
+      </center>
+      <br><br><br>
+      {% endblock %}

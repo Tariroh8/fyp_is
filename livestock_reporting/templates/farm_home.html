@@ -1,0 +1,80 @@
+{% extends "base1.html" %}
+{% load static %}
+
+{% block title %}
+login page
+{% endblock %}
+
+
+
+{% block content %}
+
+
+
+
+
+    <center>
+    <div class="card1">
+      <br><br>
+
+      <p class="d-inline-flex gap-1">
+        <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+          <img src="{% static 'images/filter.svg' %}" alt="Filter" class="me-2" width="20" height="20"> Filter Period
+        </a>
+        
+      
+      <div class="collapse" id="collapseExample">
+        <div class="card card-body">
+          <form method="GET" action="{% url 'farm_home' %}">
+            <div class="form-group">
+                <label for="start_date">Start Date:</label>
+                <input type="date" id="start_date" name="start_date" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="end_date">End Date:</label>
+                <input type="date" id="end_date" name="end_date" class="form-control">
+            </div><br>
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </form>
+        </div>
+      </div><br><br>
+
+     
+      
+
+
+    {% for case in object_list %}
+    <div class="container-fluid">
+    <div class="card text-center">
+      <div class="card-header"><img src="{% static 'images/livestock.svg' %}" alt="Filter" class="me-2" width="30" height="30">
+        
+        a {{ case.spece }} disease case reported in your area
+      </div>
+      <div class="card-body">
+        
+        <div class="alert alert-warning" role="alert"><img src="{% static 'images/warning.svg' %}" alt="Filter" class="me-2" width="20" height="20">
+        Check out for the following symptoms in your {{ case.spece }} 
+      </div>
+        <p class="card-text"><img src="{% static 'images/health.svg' %}" alt="Filter" class="me-2" width="20" height="20">{% for symptom in case.symptoms.all %}
+          {{ symptom }}"<span style="color: blue;">{{ symptom.shona_name }}</span>"...//
+        {% endfor %}</p>
+        <hr><img src="{% static 'images/location.svg' %}" alt="Filter" class="me-2" width="20" height="20">
+        District   :
+        {{case.district}}<br><br>
+        <a href="{% url 'farm_case' case.pk %}" class="btn btn-primary">
+          <img src="{% static 'images/view.svg' %}" alt="Filter" class="me-2" width="20" height="20"> View Details</a>
+      </div>
+      <div class="card-footer text-body-secondary"> <img src="{% static 'images/clock.svg' %}" alt="Filter" class="me-2" width="20" height="20">
+        Reported on :  
+        {{ case.date|date:"Y-m-d" }} <br>{{ case.date|time:"H:i" }}
+      </div>
+    </div>
+    </div>
+
+    <br><br>
+    {% endfor %}
+
+  </center>
+
+  {% endblock %}
+
